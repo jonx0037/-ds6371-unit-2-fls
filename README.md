@@ -1,6 +1,6 @@
 # DS 6371 Unit 2 Notes
 
-This is a digital garden of notes and concepts from Unit 2 of DS 6371 - Statistical Foundations for Data Science. The site is built using React and Vite, featuring interactive navigation through key statistical concepts and their practical applications.
+This digital garden contains notes and concepts from Unit 2 of DS 6371 - Statistical Foundations for Data Science. The site is built using React and Vite, featuring interactive navigation through key topics. This project is based on the original repository from my professor, available [here](https://github.com/BivinSadler/MSDS_6371_Stat_Foundations/tree/master/Unit%202).
 
 ## Topics Covered
 
