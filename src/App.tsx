@@ -7,7 +7,7 @@ import CLTSampling from './pages/CLTSampling';
 
 function App() {
   return (
-    <Router basename="/-ds6371-unit-2-fls">
+    <Router>
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
