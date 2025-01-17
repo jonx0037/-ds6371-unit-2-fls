@@ -1,4 +1,5 @@
 import { PresentationChartLineIcon } from '@heroicons/react/24/outline';
+import CreativityPlot from '../components/CreativityPlot';
 
 export default function PracticalSignificance() {
   return (
@@ -112,6 +113,43 @@ export default function PracticalSignificance() {
               </p>
             </li>
           </ol>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+          Creativity Study Example
+        </h2>
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+          <p className="text-gray-700 mb-4">
+            The creativity study comparing intrinsic vs extrinsic treatments demonstrates both statistical
+            and practical significance:
+          </p>
+          <div className="mb-6">
+            <CreativityPlot />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Statistical Significance
+              </h3>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>P-value of 0.0056 (statistically significant)</li>
+                <li>Clear difference between treatment groups</li>
+                <li>Visible separation in distributions</li>
+              </ul>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Practical Implications
+              </h3>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Substantial effect size in creativity scores</li>
+                <li>Meaningful difference in performance</li>
+                <li>Actionable insights for motivation strategies</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
     </div>
