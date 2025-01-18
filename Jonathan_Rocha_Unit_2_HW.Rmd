@@ -61,32 +61,36 @@ The bumblebee bat (Kitti's hog-nosed bat) is recognized as the world's smallest 
 `Input the bumblebee bat weight data`
 
 ```{r}
-bat_weights <- c(1.7, 1.6, 1.5, 2.0, 2.3, 1.6, 1.6, 1.8, 1.5, 1.7, 1.2, 1.4, 1.6, 1.6, 1.6)
+# Create a single data frame for consistency
+bat_data <- data.frame(weight = c(1.7, 1.6, 1.5, 2.0, 2.3, 1.6, 1.6, 1.8, 1.5, 1.7, 1.2, 1.4, 1.6, 1.6, 1.6))
 ```
 
 `Calculate comprehensive summary statistics`
 
 ```{r}
 summary_stats <- data.frame(
-  n = length(bat_weights),
-  mean = mean(bat_weights),
-  sd = sd(bat_weights),
-  se = sd(bat_weights)/sqrt(length(bat_weights)),
-  diff_from_null = mean(bat_weights) - 1.8  # Difference from hypothesized mean
+  n = length(bat_data$weight),
+  mean = mean(bat_data$weight),
+  median = median(bat_data$weight),
+  sd = sd(bat_data$weight),
+  se = sd(bat_data$weight)/sqrt(length(bat_data$weight)),
+  diff_from_null = mean(bat_data$weight) - 1.8,  # Difference from hypothesized mean
+  skewness = moments::skewness(bat_data$weight),
+  kurtosis = moments::kurtosis(bat_data$weight)
+)
+
+# Statistical tests
+sw_test <- shapiro.test(bat_data$weight)
+ad_test <- ad.test(bat_data$weight)
+t_test_result <- t.test(bat_data$weight, mu = 1.8)
+sign_test <- binom.test(
+  sum(bat_data$weight > 1.8),
+  length(bat_data$weight),
+  p = 0.5,
+  alternative = "two.sided"
 )
 ```
 
-`Calculate basic summary statistics`
-
-```{r}
-bat_summary <- data.frame(
-  n = length(bat_weights),
-  mean = mean(bat_weights),
-  sd = sd(bat_weights),
-  se = sd(bat_weights)/sqrt(length(bat_weights)),
-  t_crit = qt(0.975, df = length(bat_weights)-1)
-)
-```
 
 `Print summary statistics with clear formatting`
 
@@ -97,59 +101,6 @@ print(paste("Sample Mean:", round(summary_stats$mean, 3), "grams"))
 print(paste("Sample SD:", round(summary_stats$sd, 3), "grams"))
 print(paste("Standard Error:", round(summary_stats$se, 3), "grams"))
 print(paste("Difference from Null:", round(summary_stats$diff_from_null, 3), "grams"))
-```
-
-The sample mean of r round(summary_stats$mean, 3) grams is noticeably lower than our hypothesized value of 1.8 grams. This difference of r abs(round(summary_stats$diff_from_null, 3)) grams needs to be evaluated in the context of our sample's variability.
-
-`Create data frame for plotting`
-
-```{r}
-bat_df <- data.frame(weight = bat_weights)
-```
-
-## Data and Preliminary Analysis
-
-`Create summary statistics table`
-
-```{r}
-# Input data
-bat_weights <- c(1.7, 1.6, 1.5, 2.0, 2.3, 1.6, 1.6, 1.8, 1.5, 1.7, 1.2, 1.4, 1.6, 1.6, 1.6)
-
-# Calculate comprehensive summary statistics
-summary_stats <- data.frame(
-  n = length(bat_data$weight),
-  mean = mean(bat_data$weight),
-  median = median(bat_data$weight),
-  sd = sd(bat_data$weight),
-  se = sd(bat_data$weight)/sqrt(length(bat_data$weight)),
-  skewness = skewness(bat_data$weight),
-  kurtosis = kurtosis(bat_data$weight),
-  t_stat = (mean(bat_data$weight) - 1.8)/(sd(bat_data$weight)/sqrt(length(bat_data$weight)))
-)
-
-# Additional Statistical Tests
-# Shapiro-Wilk test for normality
-sw_test <- shapiro.test(bat_data$weight)
-# Anderson-Darling test for normality
-ad_test <- ad.test(bat_data$weight)
-# One-sample t-test
-t_test_result <- t.test(bat_data$weight, mu = 1.8)
-# Sign test for median
-sign_test <- binom.test(
-  sum(bat_data$weight > 1.8),
-  length(bat_data$weight),
-  p = 0.5,
-  alternative = "two.sided"
-)
-
-# Print summary statistics with clear formatting
-print("Summary Statistics:")
-print(paste("Sample Size (n):", summary_stats$n))
-print(paste("Sample Mean:", round(summary_stats$mean, 3), "grams"))
-print(paste("Sample SD:", round(summary_stats$sd, 3), "grams"))
-print(paste("Standard Error:", round(summary_stats$se, 3), "grams"))
-print(paste("Difference from Null:", round(summary_stats$diff_from_null, 3), "grams"))
-
 ```
 
 The sample mean of r round(summary_stats$mean, 3) grams is noticeably lower than our hypothesized value of 1.8 grams. This difference of r abs(round(summary_stats$diff_from_null, 3)) grams needs to be evaluated in the context of our sample's variability.
@@ -194,7 +145,7 @@ While not perfectly normal, the data appears to satisfy the normality assumption
 
 ```{r}
 hist_plot <- ggplot(bat_data, aes(x = weight)) +
-  geom_histogram(aes(y = ..density..), binwidth = 0.1, 
+  geom_histogram(aes(y = after_stat(density)), binwidth = 0.1,
                 fill = "#38bdf8", color = "black", alpha = 0.7) +
   geom_density(color = "#f87171", linewidth = 1) +
   geom_vline(xintercept = mean(bat_data$weight), 
@@ -352,15 +303,15 @@ We will use α = 0.05 (two-tailed test) Critical values: t₀.₀₂₅,₁₄ =
 `Calculate t-statistic`
 
 ```{r}
-t_stat <- (mean(bat_weights) - 1.8)/(sd(bat_weights)/sqrt(length(bat_weights)))
+t_stat <- (mean(bat_data$weight) - 1.8)/(sd(bat_data$weight)/sqrt(length(bat_data$weight)))
 ```
 
 `Print detailed t-statistic calculation`
 
 ```{r}
-print(paste("Sample mean:", round(mean(bat_weights), 3)))
+print(paste("Sample mean:", round(mean(bat_data$weight), 3)))
 print(paste("Hypothesized mean:", 1.8))
-print(paste("Standard error:", round(sd(bat_weights)/sqrt(length(bat_weights)), 4)))
+print(paste("Standard error:", round(sd(bat_data$weight)/sqrt(length(bat_data$weight)), 4)))
 print(paste("t-statistic:", round(t_stat, 4)))
 ```
 
@@ -369,10 +320,10 @@ print(paste("t-statistic:", round(t_stat, 4)))
 `Calculate two-tailed p-value`
 
 ```{r}
-p_value <- 2 * pt(abs(t_stat), df = length(bat_weights) - 1, lower.tail = FALSE)
+p_value <- 2 * pt(abs(t_stat), df = length(bat_data$weight) - 1, lower.tail = FALSE)
 print(paste("p-value:", round(p_value, 4)))
 
-critical_value <- qt(0.975, df = length(bat_weights) - 1)
+critical_value <- qt(0.975, df = length(bat_data$weight) - 1)
 print(paste("Critical value (±):", round(critical_value, 4)))
 ```
 
@@ -427,9 +378,9 @@ With \|t-statistic\| = r round(abs(t_stat), 4) \> critical value = r round(criti
 `Calculate 95% confidence interval`
 
 ```{r}
-t_crit <- qt(0.975, df = length(bat_weights) - 1)
-margin_error <- t_crit * sd(bat_weights)/sqrt(length(bat_weights))
-ci <- c(mean(bat_weights) - margin_error, mean(bat_weights) + margin_error)
+t_crit <- qt(0.975, df = length(bat_data$weight) - 1)
+margin_error <- t_crit * sd(bat_data$weight)/sqrt(length(bat_data$weight))
+ci <- c(mean(bat_data$weight) - margin_error, mean(bat_data$weight) + margin_error)
 print(paste("95% Confidence Interval:", round(ci[1], 3), "to", round(ci[2], 3)))
 ```
 
