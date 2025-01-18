@@ -46,7 +46,7 @@ custom_dark_theme <- theme_dark() +
     panel.grid.major = element_line(color = "#444444"),
     panel.grid.minor = element_line(color = "#333333"),
     plot.background = element_rect(fill = "#222222"),
-    panel.background = element_rect(fill = "#222222")a
+    panel.background = element_rect(fill = "#222222")
   )
 
 theme_set(custom_dark_theme)
@@ -125,8 +125,8 @@ qq_plot <- ggplot(bat_data, aes(sample = weight)) +
   annotate("text", x = -1, y = max(bat_data$weight) - 0.1,
            label = paste("Kurtosis:", round(summary_stats$kurtosis, 3)),
            color = "white", hjust = 0) +
-  custom_dark_theme
-theme(plot.title = element_text(hjust = 0.5))
+  custom_dark_theme +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 The visual diagnostics suggest:
@@ -162,8 +162,8 @@ hist_plot <- ggplot(bat_data, aes(x = weight)) +
        subtitle = paste("n =", length(bat_data$weight), ", SD =", round(sd(bat_data$weight), 3)),
        x = "Weight (grams)",
        y = "Density") +
-  custom_dark_theme
-theme(plot.title = element_text(hjust = 0.5))
+  custom_dark_theme +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 `Create t-distribution plot with critical regions`
@@ -196,8 +196,8 @@ t_plot <- ggplot(t_dist_data, aes(x = t, y = density)) +
        subtitle = paste("p-value =", round(t_test_result$p.value, 4)),
        x = "t-value",
        y = "Density") +
- custom_dark_theme
-theme(plot.title = element_text(hjust = 0.5))
+ custom_dark_theme +
+ theme(plot.title = element_text(hjust = 0.5))
 ```
 
 `Create enhanced residual plot`
@@ -218,8 +218,8 @@ residual_plot <- ggplot(data.frame(fitted = fitted_values, residuals = residuals
        subtitle = "Check for patterns and homoscedasticity",
        x = "Fitted Values",
        y = "Residuals") +
-  custom_dark_theme
-theme(plot.title = element_text(hjust = 0.5))
+  custom_dark_theme +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 `Arrange all plots in a grid`
