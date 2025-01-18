@@ -1,0 +1,262 @@
+---
+title: "Statistical Analysis of Bumblebee Bat Weights"
+author: "Jonathan A. Rocha"
+date: "January 19, 2025"
+output:
+  word_document:
+    fig_caption: true
+    toc: true
+    keep_md: true
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    df_print: paged
+course: "DS 6371 - Statistics for Data Science"
+professors: Dr. Bivin Sadler & Dr. Monnie McGee
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(plotly)
+library(tidyverse)
+library(gridExtra)
+
+custom_dark_theme <- theme_dark() +
+  theme(
+    text = element_text(color = "#FFFFFF"),
+    axis.text = element_text(color = "#FFFFFF"),
+    axis.title = element_text(color = "#FFFFFF"),
+    plot.title = element_text(color = "#FFFFFF"),
+    panel.grid.major = element_line(color = "#444444"),
+    panel.grid.minor = element_line(color = "#333333"),
+    plot.background = element_rect(fill = "#222222"),
+    panel.background = element_rect(fill = "#222222")
+  )
+
+theme_set(custom_dark_theme)
+```
+
+# Introduction
+
+The bumblebee bat (Kitti's hog-nosed bat) is recognized as the world's smallest mammal. This analysis examines weight measurements from a sample of these bats to test whether they come from a population with a mean weight of 1.8 grams.
+
+## Data and Preliminary Analysis
+
+`Input the bumblebee bat weight data`
+
+```{r}
+bat_weights <- c(1.7, 1.6, 1.5, 2.0, 2.3, 1.6, 1.6, 1.8, 1.5, 1.7, 1.2, 1.4, 1.6, 1.6, 1.6)
+```
+
+`Calculate comprehensive summary statistics`
+
+```{r}
+summary_stats <- data.frame(
+  n = length(bat_weights),
+  mean = mean(bat_weights),
+  sd = sd(bat_weights),
+  se = sd(bat_weights)/sqrt(length(bat_weights)),
+  diff_from_null = mean(bat_weights) - 1.8  # Difference from hypothesized mean
+)
+```
+
+`Calculate basic summary statistics`
+
+```{r}
+bat_summary <- data.frame(
+  n = length(bat_weights),
+  mean = mean(bat_weights),
+  sd = sd(bat_weights),
+  se = sd(bat_weights)/sqrt(length(bat_weights)),
+  t_crit = qt(0.975, df = length(bat_weights)-1)
+)
+```
+
+`Print summary statistics with clear formatting`
+
+```{r}
+print("Summary Statistics:")
+print(paste("Sample Size (n):", summary_stats$n))
+print(paste("Sample Mean:", round(summary_stats$mean, 3), "grams"))
+print(paste("Sample SD:", round(summary_stats$sd, 3), "grams"))
+print(paste("Standard Error:", round(summary_stats$se, 3), "grams"))
+print(paste("Difference from Null:", round(summary_stats$diff_from_null, 3), "grams"))
+```
+
+## Step 1: State Hypotheses
+
+The hypotheses can be written as:
+
+The null hypothesis H₀ states that the population mean weight of bumblebee bats is 1.8 grams. The alternative hypothesis H₁ states that the population mean weight differs from 1.8 grams.
+
+Mathematically, this can be expressed as:
+
+H₀: μ = 1.8 (The population mean weight equals 1.8 grams) H₁: μ ≠ 1.8 (The population mean weight differs from 1.8 grams)
+
+and visualized with a histogram of the data:
+
+`Create data frame for plotting`
+
+```{r}
+bat_df <- data.frame(weight = bat_weights)
+```
+
+## Testing Assumptions
+
+### Normality Assessment
+
+`Create QQ plot`
+
+```{r}
+ggplot(data.frame(bat_weights), aes(sample = bat_weights)) +
+  stat_qq() +
+  stat_qq_line() +
+  labs(title = "Q-Q Plot of Bumblebee Bat Weights",
+       x = "Theoretical Quantiles",
+       y = "Sample Quantiles") +
+  custom_dark_theme
+```
+
+`Create histogram with density curve`
+
+```{r}
+ggplot(data.frame(bat_weights), aes(x = bat_weights)) +
+  geom_histogram(binwidth = 0.1, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Bumblebee Bat Weights",
+       x = "Weight (grams)",
+       y = "Frequency") +
+  custom_dark_theme
+```
+
+`Convert to interactive plotly objects`
+
+```{r}
+qq_interactive <- ggplotly(qq_plot) %>%
+  layout(
+    plot_bgcolor = "#222222",
+    paper_bgcolor = "#222222",
+    font = list(color = "#FFFFFF"),
+    xaxis = list(
+      gridcolor = "#444444",
+      title = list(
+        text = "Theoretical Quantiles",
+        font = list(color = "#FFFFFF", size = 14)
+      ),
+      tickfont = list(color = "#FFFFFF")
+    ),
+    yaxis = list(
+      gridcolor = "#444444",
+      title = list(
+        text = "Sample Quantiles",
+        font = list(color = "#FFFFFF", size = 14)
+      ),
+      tickfont = list(color = "#FFFFFF")
+    ),
+    margin = list(l = 80, r = 40, t = 80, b = 80)  
+  )
+
+hist_interactive <- ggplotly(hist_plot) %>%
+  layout(
+    plot_bgcolor = "#222222",
+    paper_bgcolor = "#222222",
+    font = list(color = "#FFFFFF"),
+    xaxis = list(
+      gridcolor = "#444444",
+      title = list(
+        text = "Weight (grams)",
+        font = list(color = "#FFFFFF", size = 14)
+      ),
+      tickfont = list(color = "#FFFFFF")
+    ),
+    yaxis = list(
+      gridcolor = "#444444",
+      title = list(
+        text = "Density",
+        font = list(color = "#FFFFFF", size = 14)
+      ),
+      tickfont = list(color = "#FFFFFF")
+    ),
+    margin = list(l = 80, r = 40, t = 80, b = 80)  
+  )
+```
+
+`Display plots side by side using subplot`
+
+```{r}
+subplot(qq_interactive, hist_interactive, nrows = 1, 
+        titleX = TRUE, titleY = TRUE,  
+        margin = 0.1) %>%  
+  layout(
+    showlegend = FALSE,
+    title = list(
+      text = "Bumblebee Bat Weight Distribution Analysis",
+      font = list(color = "#FFFFFF", size = 16),
+      y = 0.95
+    ),
+    margin = list(t = 100, b = 100),  
+    width = 1200,   
+    height = 600    
+  )
+```
+
+## Step 2: Specify Significance Level
+
+We will use α = 0.05 (two-tailed test) Critical values: t₀.₀₂₅,₁₄ = ±2.145 (from t-distribution with 14 df)
+
+## Step 3: Calculate Test Statistic
+
+`Calculate t-statistic`
+
+```{r}
+t_stat <- (mean(bat_weights) - 1.8)/(sd(bat_weights)/sqrt(length(bat_weights)))
+```
+
+`Print detailed t-statistic calculation`
+
+```{r}
+print(paste("Sample mean:", round(mean(bat_weights), 3)))
+print(paste("Hypothesized mean:", 1.8))
+print(paste("Standard error:", round(sd(bat_weights)/sqrt(length(bat_weights)), 4)))
+print(paste("t-statistic:", round(t_stat, 4)))
+```
+
+## Step 4: Find P-value
+
+`Calculate two-tailed p-value`
+
+```{r}
+p_value <- 2 * pt(abs(t_stat), df = length(bat_weights) - 1, lower.tail = FALSE)
+print(paste("p-value:", round(p_value, 4)))
+```
+
+`Additional Context`
+
+```{r}
+critical_value <- qt(0.975, df = length(bat_weights) - 1)
+print(paste("Critical value (±):", round(critical_value, 4)))
+```
+
+## Step 5: Make Decision
+
+With \|t-statistic\| = r round(abs(t_stat), 4) \> critical value = r round(critical_value, 4), and p-value = r round(p_value, 4) \< α = 0.05, we [reject the null hypothesis]{.underline}.
+
+## Step 6: State Conclusion and Confidence Interval
+
+`Calculate 95% confidence interval`
+
+```{r}
+t_crit <- qt(0.975, df = length(bat_weights) - 1)
+margin_error <- t_crit * sd(bat_weights)/sqrt(length(bat_weights))
+ci <- c(mean(bat_weights) - margin_error, mean(bat_weights) + margin_error)
+print(paste("95% Confidence Interval:", round(ci[1], 3), "to", round(ci[2], 3)))
+```
+
+**Statistical Conclusion**: There is sufficient evidence to conclude that the true population mean weight of bumblebee bats differs from 1.8 grams (p = r round(p_value, 4)). The 95% confidence interval for the true population mean is (r round(ci[1], 3), r round(ci[2], 3)) grams.
+
+**Practical Interpretation**: The sample data suggests that the hypothesized mean weight of 1.8 grams is plausible for this population. While our sample mean of r round(mean(bat_weights), 3) grams differs slightly from 1.8, this difference is not statistically significant. The confidence interval tells us we can be 95% confident that the true population mean falls between r round(ci[1], 3) and r round(ci[2], 3) grams.
+
+**Scope of Inference**: While our analysis provides valuable insights about bumblebee bat weights, the generalizability of these findings depends on the sampling methodology, which wasn't specified. If these measurements represent a random sample from the broader population, our conclusions could extend to the species as a whole. However, if the sample was taken from a specific location or time period, our inferences should be limited accordingly.
