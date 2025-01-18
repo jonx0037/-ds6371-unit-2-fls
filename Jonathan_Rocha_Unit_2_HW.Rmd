@@ -127,6 +127,8 @@ qq_plot <- ggplot(bat_data, aes(sample = weight)) +
            color = "white", hjust = 0) +
   custom_dark_theme +
   theme(plot.title = element_text(hjust = 0.5))
+
+print(qq_plot)
 ```
 
 The visual diagnostics suggest:
@@ -164,6 +166,8 @@ hist_plot <- ggplot(bat_data, aes(x = weight)) +
        y = "Density") +
   custom_dark_theme +
   theme(plot.title = element_text(hjust = 0.5))
+
+print(hist_plot)
 ```
 
 `Create t-distribution plot with critical regions`
@@ -198,6 +202,8 @@ t_plot <- ggplot(t_dist_data, aes(x = t, y = density)) +
        y = "Density") +
  custom_dark_theme +
  theme(plot.title = element_text(hjust = 0.5))
+
+print(t_plot)
 ```
 
 `Create enhanced residual plot`
@@ -220,6 +226,8 @@ residual_plot <- ggplot(data.frame(fitted = fitted_values, residuals = residuals
        y = "Residuals") +
   custom_dark_theme +
   theme(plot.title = element_text(hjust = 0.5))
+
+print(residual_plot)
 ```
 
 `Arrange all plots in a grid`
@@ -258,6 +266,8 @@ qq_interactive <- ggplotly(qq_plot) %>%
     margin = list(l = 80, r = 40, t = 80, b = 80)  
   )
 
+print(qq_interactive)
+
 hist_interactive <- ggplotly(hist_plot) %>%
   layout(
     plot_bgcolor = "#222222",
@@ -280,6 +290,24 @@ hist_interactive <- ggplotly(hist_plot) %>%
       tickfont = list(color = "#FFFFFF")
     ),
     margin = list(l = 80, r = 40, t = 80, b = 80)  
+  )
+
+print(hist_interactive)
+```
+
+`Print interactive plots side by side`
+```{r}
+plotly::subplot(qq_interactive, hist_interactive, nrows = 1, titleX = TRUE, titleY = TRUE, widths = c(0.5, 0.5)) %>%
+  layout(
+    plot_bgcolor = "#222222",
+    paper_bgcolor = "#222222",
+    font = list(color = "#FFFFFF"),
+    margin = list(t = 50, b = 50, l = 50, r = 50),
+    showlegend = FALSE,
+    title = list(
+      text = "Interactive Plots of Bumblebee Bat Weights",
+      font = list(color = "#FFFFFF", size = 16)
+    )
   )
 ```
 
