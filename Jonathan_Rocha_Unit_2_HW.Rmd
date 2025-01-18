@@ -173,8 +173,9 @@ print(hist_plot)
 `Create t-distribution plot with critical regions`
 
 ```{r}
-t_stat <- summary_stats$t_stat
-df <- summary_stats$n - 1
+# Calculate t-statistic
+t_stat <- (mean(bat_data$weight) - 1.8)/(sd(bat_data$weight)/sqrt(length(bat_data$weight)))
+df <- length(bat_data$weight) - 1
 t_crit <- qt(0.975, df)
 
 t_vals <- seq(-4, 4, length.out = 1000)
@@ -414,6 +415,6 @@ print(paste("95% Confidence Interval:", round(ci[1], 3), "to", round(ci[2], 3)))
 
 **Statistical Conclusion**: There is sufficient evidence to conclude that the true population mean weight of bumblebee bats differs from 1.8 grams (p = r round(p_value, 4)). The 95% confidence interval for the true population mean is (r round(ci[1], 3), r round(ci[2], 3)) grams.
 
-**Practical Interpretation**: The sample data suggests that the hypothesized mean weight of 1.8 grams is plausible for this population. While our sample mean of r round(mean(bat_weights), 3) grams differs slightly from 1.8, this difference is not statistically significant. The confidence interval tells us we can be 95% confident that the true population mean falls between r round(ci[1], 3) and r round(ci[2], 3) grams.
+**Practical Interpretation**: The sample data suggests that the hypothesized mean weight of 1.8 grams is plausible for this population. While our sample mean of r round(mean(bat_data$weight), 3) grams differs slightly from 1.8, this difference is not statistically significant. The confidence interval tells us we can be 95% confident that the true population mean falls between r round(ci[1], 3) and r round(ci[2], 3) grams.
 
 **Scope of Inference**: While our analysis provides valuable insights about bumblebee bat weights, the generalizability of these findings depends on the sampling methodology, which wasn't specified. If these measurements represent a random sample from the broader population, our conclusions could extend to the species as a whole. However, if the sample was taken from a specific location or time period, our inferences should be limited accordingly.
