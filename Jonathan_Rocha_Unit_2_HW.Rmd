@@ -46,7 +46,7 @@ custom_dark_theme <- theme_dark() +
     panel.grid.major = element_line(color = "#444444"),
     panel.grid.minor = element_line(color = "#333333"),
     plot.background = element_rect(fill = "#222222"),
-    panel.background = element_rect(fill = "#222222")
+    panel.background = element_rect(fill = "#222222")a
   )
 
 theme_set(custom_dark_theme)
