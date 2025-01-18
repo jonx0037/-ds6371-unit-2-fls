@@ -215,7 +215,7 @@ residual_plot <- ggplot(data.frame(fitted = fitted_values, residuals = residuals
            label = paste("SD of residuals:", round(sd(residuals), 3)),
            color = "white") +
   labs(title = "Residual Plot",
-       subtitle = "Check for patterns and homoscedasticity",
+       subtitle = "Check for patterns",
        x = "Fitted Values",
        y = "Residuals") +
   custom_dark_theme +
