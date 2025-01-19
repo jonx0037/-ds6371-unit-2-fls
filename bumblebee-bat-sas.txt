@@ -1,0 +1,109 @@
+/* Define custom dark theme style template */
+proc template;
+    define style DarkTheme;
+        parent = styles.HTMLBlue;
+        /* Background colors */
+        style body / 
+            background = "#222222"
+            color = "white";
+        style table / 
+            background = "#333333"
+            color = "white";
+        /* Graph elements */
+        style GraphWalls / 
+            color = "#222222"
+            fillcolor = "#222222";
+        style GraphBackground / 
+            color = "#222222"
+            fillcolor = "#222222";
+        style GraphGridLines / 
+            color = "#444444";
+        style GraphText / 
+            color = "white";
+        style GraphDataDefault / 
+            color = "#38bdf8"
+            contrastcolor = "#f87171";
+        style GraphBoxPlot / 
+            color = "#38bdf8";
+        /* Table elements */
+        style header /
+            background = "#444444"
+            color = "white";
+        style rowheader /
+            background = "#333333"
+            color = "white";
+        style data /
+            background = "#333333"
+            color = "white";
+        replace Table from Output /
+            frame = void
+            rules = groups
+            cellspacing = 1
+            cellpadding = 7
+            bordercolor = "#444444";
+    end;
+run;
+
+/* Apply dark theme to all output */
+ods html style=DarkTheme;
+ods graphics / reset=all antialias=on;
+
+/* Create the bumblebee bat dataset */
+data bumblebee;
+    input weight @@;
+    datalines;
+1.7 1.6 1.5 2.0 2.3 1.6 1.6 1.8 1.5 1.7 1.2 1.4 1.6 1.6 1.6
+;
+run;
+
+/* Basic descriptive statistics with styled output */
+proc means data=bumblebee n mean std stderr t prt;
+    var weight;
+    output out=stats n=n mean=mean std=std stderr=stderr;
+    title color=white "Descriptive Statistics for Bumblebee Bat Weights";
+run;
+
+/* Test for normality with styled output */
+proc univariate data=bumblebee normal plot;
+    var weight;
+    title color=white "Normality Analysis of Bumblebee Bat Weights";
+    qqplot weight / normal(mu=est sigma=est color="#f87171")
+                    grid
+                    square
+                    vaxislabel="Sample Quantiles"
+                    haxislabel="Theoretical Quantiles"
+                    vaxis=axis1
+                    haxis=axis2;
+    inset normal(mu sigma) / format=6.3 position=se;
+    histogram weight / normal(color="#f87171")
+                      fillattrs=(color="#38bdf8" transparency=0.7)
+                      gridattrs=(color="#444444");
+run;
+
+/* One-sample t-test with styled output */
+proc ttest data=bumblebee h0=1.8 sides=2 alpha=0.05;
+    var weight;
+    title color=white "One-Sample t-Test for Bumblebee Bat Weights";
+run;
+
+/* Create visualization of data */
+proc sgplot data=bumblebee;
+    histogram weight / fillattrs=(color="#38bdf8" transparency=0.7)
+                      binwidth=0.1;
+    density weight / lineattrs=(color="#f87171" thickness=2);
+    refline 1.8 / axis=x lineattrs=(color="#f87171" pattern=dash thickness=2) 
+                   label="H₀: μ = 1.8g"
+                   labelattrs=(color="white");
+    refline 1.647 / axis=x lineattrs=(color="#818cf8" pattern=2 thickness=2) 
+                    label="Sample Mean"
+                    labelattrs=(color="white");
+    xaxis label="Weight (grams)" labelattrs=(color="white")
+          valueattrs=(color="white") gridattrs=(color="#444444");
+    yaxis label="Density" labelattrs=(color="white")
+          valueattrs=(color="white") gridattrs=(color="#444444");
+    title "Distribution of Bumblebee Bat Weights" color=white;
+run;
+
+/* Reset ODS settings */
+ods html close;
+ods graphics / reset=all;

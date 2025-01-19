@@ -1,0 +1,112 @@
+/* Create the bumblebee bat dataset */
+data pocket_cash;
+    input school $ amount;
+    datalines;
+SMU 34
+SMU 1200
+SMU 23
+SMU 50
+SMU 60
+SMU 50
+SMU 0
+SMU 0
+SMU 30
+SMU 89
+SMU 0
+SMU 300
+SMU 400
+SMU 20
+SMU 10
+SMU 0
+SEATTLE 20
+SEATTLE 10
+SEATTLE 5
+SEATTLE 0
+SEATTLE 30
+SEATTLE 50
+SEATTLE 0
+SEATTLE 100
+SEATTLE 110
+SEATTLE 0
+SEATTLE 40
+SEATTLE 10
+SEATTLE 3
+SEATTLE 0
+;
+run;
+
+/* Basic descriptive statistics */
+proc means data=pocket_cash n mean std stderr t prt;
+    class school;
+    var amount;
+    output out=stats n=n mean=mean std=std stderr=stderr;
+    title "Descriptive Statistics by School";
+run;
+
+/* Test for normality */
+proc univariate data=pocket_cash normal plot;
+    class school;
+    var amount;
+    title "Normality Tests and Plots";
+    qqplot amount / normal(mu=est sigma=est);
+    histogram amount / normal;
+run;
+
+/* Levene's test for equality of variances */
+proc glm data=pocket_cash;
+    class school;
+    model amount = school;
+    means school / hovtest=levene;
+    title "Levene's Test for Homogeneity of Variance";
+run;
+quit;
+
+/* Two-sample t-test */
+proc ttest data=pocket_cash;
+    class school;
+    var amount;
+    title "Two-Sample t-Test Results";
+run;
+
+/* Box plot */
+proc sgplot data=pocket_cash;
+    vbox amount / category=school;
+    xaxis label="School";
+    yaxis label="Amount ($)";
+    title "Box Plot of Pocket Cash by School";
+run;
+
+/* Histogram by school */
+proc sgplot data=pocket_cash;
+    histogram amount / group=school transparency=0.5;
+    density amount / group=school type=kernel;
+    xaxis label="Amount ($)";
+    yaxis label="Density";
+    title "Distribution of Pocket Cash by School";
+run;
+
+/* Calculate effect size (Cohen's d) */
+proc iml;
+    use pocket_cash;
+    read all var {amount} where(school="SMU");
+    read all var {amount} where(school="SEATTLE");
+    smu = amount;
+    seattle = amount;
+    
+    /* Calculate means and standard deviations */
+    mean_smu = mean(smu);
+    mean_seattle = mean(seattle);
+    n_smu = nrow(smu);
+    n_seattle = nrow(seattle);
+    
+    /* Calculate pooled standard deviation */
+    var_smu = var(smu);
+    var_seattle = var(seattle);
+    pooled_sd = sqrt(((n_smu-1)*var_smu + (n_seattle-1)*var_seattle)/(n_smu + n_seattle - 2));
+    
+    /* Calculate Cohen's d */
+    cohens_d = (mean_smu - mean_seattle)/pooled_sd;
+    
+    print "Effect Size Analysis";
+    print cohens_d[label="Cohen's d"];
+quit;
